@@ -36,7 +36,7 @@ export default async function login(req: NextApiRequest, res: NextApiResponse): 
         }
 
         // Extraer el primer usuario encontrado (se asume que email es único)
-        const user = rows[0] as { email: string; password: string };
+        const user = rows[0] as { email: string; password: string, id: number };
 
         // Comparar la contraseña proporcionada con la almacenada en la base de datos
         if (password !== user.password) {
@@ -52,7 +52,12 @@ export default async function login(req: NextApiRequest, res: NextApiResponse): 
         );
 
         // Devolver el token JWT al cliente
-        res.status(200).json({ token });
+        res.status(200).json(
+            {
+                token: token,
+                idUser: user.id
+            }
+        );
 
     } catch (error: unknown) {
         // Verificar que el error tiene la propiedad `message` antes de acceder a ella

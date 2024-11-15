@@ -14,7 +14,6 @@ export interface LoginRequest {
 
 export interface JwtPayload {
     email: string;
-    role: string;
 }
 
 
