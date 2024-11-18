@@ -25,9 +25,10 @@ export default async function login(req: NextApiRequest, res: NextApiResponse): 
         return res.status(400).json({ error: 'Database configuration is required' }); // Si falta la configuración de la base de datos, devuelve un error 400
     }
 
+    let db;
     try {
         // Crear la conexión dinámica a la base de datos usando la configuración proporcionada
-        const db = await createDynamicConnection(dbConfig);
+        db = await createDynamicConnection(dbConfig);
 
         // Consultar la base de datos para buscar al usuario con el correo electrónico proporcionado
         const [rows] = await db.execute('SELECT * FROM worker WHERE email = ?', [email]) as [RowDataPacket[], FieldPacket[]];
@@ -38,7 +39,7 @@ export default async function login(req: NextApiRequest, res: NextApiResponse): 
         }
 
         // Extraer el primer usuario encontrado (se asume que email es único)
-        const user = rows[0] as { email: string; password: string, id: number };
+        const user = rows[0] as { email: string; password: string; id: number; };
 
         // Comparar la contraseña proporcionada con la almacenada en la base de datos
         if (password !== user.password) {
@@ -54,12 +55,10 @@ export default async function login(req: NextApiRequest, res: NextApiResponse): 
         );
 
         // Devolver el token JWT al cliente
-        res.status(200).json(
-            {
-                token: token,
-                idUser: user.id
-            }
-        );
+        res.status(200).json({
+            token: token,
+            idUser: user.id
+        });
 
     } catch (error: unknown) {
         // Verificar que el error tiene la propiedad `message` antes de acceder a ella
@@ -67,6 +66,11 @@ export default async function login(req: NextApiRequest, res: NextApiResponse): 
             res.status(500).json({ error: error.message }); // Ahora `error.message` es seguro de usar
         } else {
             res.status(500).json({ error: 'An unknown error occurred' }); // Si no es una instancia de Error, respondemos con un mensaje genérico
+        }
+    } finally {
+        // Asegúrate de cerrar la conexión si es que fue creada
+        if (db) {
+            await db.end(); // Cierra la conexión de MySQL
         }
     }
 }

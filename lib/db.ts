@@ -8,6 +8,7 @@ export const createDynamicConnection = async (dbConfig: { host: string, user: st
         user: dbConfig.user,
         password: dbConfig.password,
         database: dbConfig.database,
+        connectionLimit: 10, // Limita el número de conexiones simultáneas
     });
     return connection;
 };
