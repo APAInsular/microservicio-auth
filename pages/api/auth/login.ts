@@ -1,13 +1,15 @@
-// pages/api/auth/login.ts
 import { NextApiRequest, NextApiResponse } from 'next'; // Importa los tipos de Next.js para las solicitudes y respuestas
 import jwt from 'jsonwebtoken'; // Importa la librería jsonwebtoken para generar el token
-//import bcrypt from 'bcryptjs'; // Importa bcryptjs para comparar la contraseña encriptada
 import { RowDataPacket, FieldPacket } from 'mysql2'; // Importa los tipos de mysql2 para las filas de datos y metadatos
 import { createDynamicConnection } from '../../../lib/db'; // Función para crear una conexión dinámica a la base de datos
 import { LoginRequest, JwtPayload } from '../../../types'; // Tipos personalizados para las solicitudes y payload del JWT
+import corsMiddleware from '../../../middlewares/corsMiddleware'; // Importa el middleware de CORS
 
 // Función de autenticación que maneja la solicitud de login
 export default async function login(req: NextApiRequest, res: NextApiResponse): Promise<void> {
+    // Aplica el middleware de CORS
+    await corsMiddleware(req, res);
+
     // Verificar si el método de la solicitud es POST, si no, devolver un error 405 (Método no permitido)
     if (req.method !== 'POST') {
         res.setHeader('Allow', ['POST']); // Establece los métodos permitidos para la ruta
