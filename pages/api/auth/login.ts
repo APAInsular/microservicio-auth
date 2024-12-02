@@ -60,7 +60,7 @@ export default async function login(req: NextApiRequest, res: NextApiResponse): 
             idUser: user.id
         });
 
-    } catch (error: unknown) {
+    } catch (error) {
         // Verificar que el error tiene la propiedad `message` antes de acceder a ella
         if (error instanceof Error) {
             res.status(500).json({ error: error.message }); // Ahora `error.message` es seguro de usar
